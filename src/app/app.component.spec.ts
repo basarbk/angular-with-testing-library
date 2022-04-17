@@ -1,49 +1,43 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { render, screen } from '@testing-library/angular';
+import { fireEvent, render, screen } from '@testing-library/angular';
+import { FormsModule } from '@angular/forms';
 
 describe('AppComponent', () => {
+
   describe('Default test setup', () => {
     beforeEach(async () => {
       await TestBed.configureTestingModule({
         declarations: [
           AppComponent
         ],
+        imports: [
+          FormsModule
+        ]
       }).compileComponents();
     });
-  
-    it('should create the app', () => {
-      const fixture = TestBed.createComponent(AppComponent);
-      const app = fixture.componentInstance;
-      expect(app).toBeTruthy();
-    });
-  
-    it(`should have as title 'testing-lib'`, () => {
-      const fixture = TestBed.createComponent(AppComponent);
-      const app = fixture.componentInstance;
-      expect(app.title).toEqual('testing-lib');
-    });
-  
-    it('should render title', () => {
+    it('enables the button after clicking agreed', () => {
       const fixture = TestBed.createComponent(AppComponent);
       fixture.detectChanges();
       const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.querySelector('.content span')?.textContent).toContain('testing-lib app is running!');
-    });
-
-    it('should have Resources header', () => {
-      const fixture = TestBed.createComponent(AppComponent);
+      const checkbox = compiled.querySelector('input[type="checkbox"]') as HTMLInputElement;
+      checkbox.click();
       fixture.detectChanges();
-      const compiled = fixture.nativeElement as HTMLElement;
-      expect(compiled.querySelector('h2')?.textContent).toContain('Resources');
+      const button = compiled.querySelector('button') as HTMLButtonElement;
+      expect(button.disabled).toBeFalsy();
     })
   })
 
   describe('With testing-library', () => {
-    it('should have Resources header', async () => {
-      await render(AppComponent);
-      const header = screen.getByRole('heading', { name: 'Resources'});
-      expect(header).toBeTruthy();
+    it('enables the button after clicking agreed', async () => {
+      await render(AppComponent, {
+        imports: [ FormsModule ]
+      });
+      const checkbox = screen.getByLabelText('Agreed')
+      fireEvent.click(checkbox)
+      const button = screen.getByRole('button', { name: 'Submit'}) as HTMLButtonElement;
+      expect(button.disabled).toBeFalsy();
     })
-  });
+  })
+
 });
